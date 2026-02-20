@@ -10,16 +10,33 @@ export function HomeScreen({ onNavigate }: HomeScreenProps) {
   return (
     <div className="relative flex min-h-screen flex-col items-center justify-center px-6 pb-24">
       {/* CAVILIA: grande, dourado, brilho metálico */}
-      <h1 className="mb-0 font-serif text-5xl font-bold tracking-[0.14em] text-gold drop-shadow-[0_0_16px_rgba(232,184,75,0.55)]">
+      <h1
+        className="mb-0 font-serif text-5xl font-bold tracking-[0.14em]"
+        style={{
+          background: "linear-gradient(180deg, #f0bc2a 0%, #d4a017 40%, #f5cc50 60%, #a87c0e 100%)",
+          WebkitBackgroundClip: "text",
+          WebkitTextFillColor: "transparent",
+          backgroundClip: "text",
+          filter: "drop-shadow(0 0 10px rgba(212,160,23,0.6))",
+        }}
+      >
         CAVILIA
       </h1>
       {/* — STUDIO CLUB 1998 — com linhas douradas */}
       <div className="mt-2 mb-8 flex items-center gap-2">
-        <span className="text-gold/70">—</span>
-        <span className="font-sans text-[11px] font-medium tracking-[0.28em] uppercase text-gold/90">
+        <span className="text-gold/80">—</span>
+        <span
+          className="font-sans text-[11px] font-medium tracking-[0.28em] uppercase"
+          style={{
+            background: "linear-gradient(180deg, #f0bc2a 0%, #d4a017 50%, #f5cc50 100%)",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+            backgroundClip: "text",
+          }}
+        >
           Studio Club 1998
         </span>
-        <span className="text-gold/70">—</span>
+        <span className="text-gold/80">—</span>
       </div>
 
       {/* Emblema circular central: cavalo e ferradura */}
