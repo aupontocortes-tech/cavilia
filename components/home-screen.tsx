@@ -9,16 +9,35 @@ interface HomeScreenProps {
 export function HomeScreen({ onNavigate }: HomeScreenProps) {
   const [side, setSide] = useState<"horse" | "cowboy">("horse")
   const [flipClass, setFlipClass] = useState("")
+  const [clickCount, setClickCount] = useState(0)
 
   function handleCoinClick() {
     if (flipClass) return // já girando
-    const landOn = Math.random() < 0.5 ? "horse" : "cowboy"
-    const animClass = landOn === "cowboy" ? "flipping-to-back" : "flipping-to-front"
-    setFlipClass(animClass)
-    setTimeout(() => {
-      setSide(landOn)
-      setFlipClass("")
-    }, 1400)
+
+    if (side === "cowboy") {
+      // qualquer clique no cowboy volta pro cavalo
+      setFlipClass("flipping-to-front")
+      setTimeout(() => {
+        setSide("horse")
+        setFlipClass("")
+        setClickCount(0)
+      }, 1400)
+      return
+    }
+
+    // lado cavalo: conta os cliques
+    const newCount = clickCount + 1
+    setClickCount(newCount)
+
+    if (newCount >= 3) {
+      // 3 cliques → vai pro cowboy
+      setFlipClass("flipping-to-back")
+      setTimeout(() => {
+        setSide("cowboy")
+        setFlipClass("")
+        setClickCount(0)
+      }, 1400)
+    }
   }
 
   return (
@@ -37,7 +56,20 @@ export function HomeScreen({ onNavigate }: HomeScreenProps) {
       </div>
 
       {/* Emblema circular central — clique para girar a moeda */}
-      <div className="emblem-ring coin-scene relative mb-12 flex-shrink-0" onClick={handleCoinClick} style={{ cursor: flipClass ? "default" : "pointer" }}>
+      <div className="coin-scene relative mb-12 flex-shrink-0 flex flex-col items-center gap-2">
+        {/* Pontinhos indicadores de clique */}
+        {side === "horse" && !flipClass && (
+          <div className="absolute -bottom-6 flex gap-1.5">
+            {[0, 1, 2].map((i) => (
+              <div
+                key={i}
+                className="h-1.5 w-1.5 rounded-full transition-all duration-300"
+                style={{ background: i < clickCount ? "#d4a017" : "rgba(212,160,23,0.25)" }}
+              />
+            ))}
+          </div>
+        )}
+        <div className="emblem-ring" onClick={handleCoinClick} style={{ cursor: flipClass ? "default" : "pointer" }}>
         <div className={`coin-card ${flipClass}`}>
           {/* Frente: Cavalo */}
           <div className="coin-face bg-black">
@@ -61,6 +93,7 @@ export function HomeScreen({ onNavigate }: HomeScreenProps) {
               height={144}
             />
           </div>
+        </div>
         </div>
       </div>
 
