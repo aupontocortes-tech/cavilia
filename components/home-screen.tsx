@@ -27,8 +27,8 @@ export function HomeScreen({ onNavigate }: HomeScreenProps) {
 
     const newCount = clickCount + 1
 
-    if (newCount >= 4) {
-      // 4º clique → gira e FICA no cowboy
+    if (newCount >= 3) {
+      // 3º clique → gira e FICA no cowboy
       setFlipClass("flipping-to-back")
       setTimeout(() => {
         setSide("cowboy")
@@ -36,7 +36,7 @@ export function HomeScreen({ onNavigate }: HomeScreenProps) {
         setClickCount(0)
       }, 1400)
     } else {
-      // cliques 1, 2, 3 → gira e volta pro cavalo
+      // cliques 1, 2 → gira e volta pro cavalo
       setClickCount(newCount)
       setFlipClass("flipping-to-front")
       setTimeout(() => {
@@ -65,7 +65,7 @@ export function HomeScreen({ onNavigate }: HomeScreenProps) {
         {/* Pontinhos indicadores de clique */}
         {side === "horse" && !flipClass && (
           <div className="absolute -bottom-6 flex gap-1.5">
-            {[0, 1, 2].map((i) => (
+            {[0, 1].map((i) => (
               <div
                 key={i}
                 className="h-1.5 w-1.5 rounded-full transition-all duration-300"
