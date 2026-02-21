@@ -6,6 +6,7 @@ import { format } from "date-fns"
 import { ptBR } from "date-fns/locale"
 import type { BookingData } from "./schedule-screen"
 import type { UserData } from "./auth-screen"
+import { getLevelConfig, visitasParaProximoNivel, progressoNivel } from "@/lib/client-level"
 
 interface ProfileScreenProps {
   bookings: BookingData[]
@@ -45,7 +46,13 @@ export function ProfileScreen({ bookings, user, onCancelBooking, onUpdateUser, o
     reader.readAsDataURL(file)
   }
 
-  const joinYear = new Date().getFullYear()
+  const totalVisitas = user?.totalVisitas ?? 0
+  const levelCfg = getLevelConfig(totalVisitas)
+  const faltam = visitasParaProximoNivel(totalVisitas)
+  const progresso = progressoNivel(totalVisitas)
+  const joinYear = user?.dataCadastro
+    ? new Date(user.dataCadastro).getFullYear()
+    : new Date().getFullYear()
 
   return (
     <div className="flex min-h-screen flex-col pb-24">
@@ -81,14 +88,51 @@ export function ProfileScreen({ bookings, user, onCancelBooking, onUpdateUser, o
           <p className="mt-0.5 text-xs text-muted-foreground">{user.phone}</p>
         )}
         <p className="mt-0.5 text-xs text-muted-foreground">
-          Membro desde {joinYear}
+          Cliente desde {joinYear}
         </p>
-        <div className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-gold/30 bg-gold/10 px-3 py-1">
-          <div className="h-1.5 w-1.5 rounded-full bg-gold" />
-          <span className="text-[10px] font-medium tracking-wider uppercase text-gold">
-            Cliente VIP
+
+        {/* Badge de nível */}
+        <div
+          className="mt-3 inline-flex items-center gap-2 rounded-full px-4 py-1.5"
+          style={{
+            border: `1.5px solid ${levelCfg.borderColor}`,
+            background: levelCfg.bgColor,
+            boxShadow: levelCfg.label === "VIP" ? `0 0 14px 3px ${levelCfg.glowColor}` : undefined,
+          }}
+        >
+          <span className="text-sm">{levelCfg.emoji}</span>
+          <span
+            className="text-[11px] font-bold tracking-wider uppercase"
+            style={{ color: levelCfg.color }}
+          >
+            {levelCfg.label}
+          </span>
+          <span className="text-[10px] text-muted-foreground">
+            • {totalVisitas} {totalVisitas === 1 ? "visita" : "visitas"}
           </span>
         </div>
+
+        {/* Barra de progresso para próximo nível */}
+        {faltam !== null && (
+          <div className="mt-3 w-full max-w-[200px]">
+            <div className="h-1.5 w-full rounded-full bg-border overflow-hidden">
+              <div
+                className="h-full rounded-full transition-all duration-500"
+                style={{ width: `${progresso}%`, background: levelCfg.color }}
+              />
+            </div>
+            <p className="mt-1 text-center text-[10px] text-muted-foreground/60">
+              Faltam {faltam} visita{faltam !== 1 ? "s" : ""} para {
+                totalVisitas < 5 ? "Prata ⚪" :
+                totalVisitas < 10 ? "Ouro 🟡" : "VIP 💎"
+              }
+            </p>
+          </div>
+        )}
+        {faltam === null && (
+          <p className="mt-1 text-[10px] text-gold/70">✨ Nível máximo alcançado!</p>
+        )}
+
         {user && (
           <button
             onClick={onLogout}

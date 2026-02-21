@@ -42,6 +42,19 @@ export default function CaviliaApp() {
     setBookings((prev) => [...prev, booking])
     setLastBooking(booking)
     setShowSuccess(true)
+    // Incrementa visitas e recalcula nível
+    if (currentUser) {
+      const novasVisitas = (currentUser.totalVisitas ?? 0) + 1
+      const updated = { ...currentUser, totalVisitas: novasVisitas }
+      setCurrentUser(updated)
+      // Persiste no localStorage
+      const raw = localStorage.getItem("cavilia-users")
+      const users = raw ? JSON.parse(raw) : []
+      const idx = users.findIndex((u: typeof updated) => u.phone === currentUser.phone)
+      if (idx >= 0) users[idx] = updated
+      localStorage.setItem("cavilia-users", JSON.stringify(users))
+      localStorage.setItem("cavilia-current-user", JSON.stringify(updated))
+    }
   }
 
   function handleCancelBooking(index: number) {

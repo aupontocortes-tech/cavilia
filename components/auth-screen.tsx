@@ -9,6 +9,8 @@ export interface UserData {
   email: string
   password: string
   photoUrl?: string
+  totalVisitas: number
+  dataCadastro: string  // ISO string
 }
 
 interface AuthScreenProps {
@@ -90,6 +92,8 @@ export function AuthScreen({ onAuth, onBack }: AuthScreenProps) {
       email: regEmail.trim(),
       password: regPass,
       photoUrl: regPhoto || undefined,
+      totalVisitas: 0,
+      dataCadastro: new Date().toISOString(),
     }
     users.push(newUser)
     localStorage.setItem("cavilia-users", JSON.stringify(users))
