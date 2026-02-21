@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { HomeScreen } from "@/components/home-screen"
-import { ScheduleScreen, type BookingData } from "@/components/schedule-screen"
+import { ScheduleScreen, type BookingData, type ServiceItem, DEFAULT_SERVICES } from "@/components/schedule-screen"
 import { ProfileScreen } from "@/components/profile-screen"
 import { SuccessScreen } from "@/components/success-screen"
 import { AdmLoginScreen } from "@/components/adm-login-screen"
@@ -17,6 +17,7 @@ export default function CaviliaApp() {
   const [lastBooking, setLastBooking] = useState<BookingData | null>(null)
   const [showSuccess, setShowSuccess] = useState(false)
   const [admLoggedIn, setAdmLoggedIn] = useState(false)
+  const [services, setServices] = useState<ServiceItem[]>(DEFAULT_SERVICES)
 
   function handleNavigate(screen: Screen) {
     setShowSuccess(false)
@@ -65,6 +66,7 @@ export default function CaviliaApp() {
           <ScheduleScreen
             onBack={() => setActiveScreen("home")}
             onConfirm={handleConfirmBooking}
+            services={services}
           />
         )}
         {activeScreen === "profile" && (
@@ -79,8 +81,10 @@ export default function CaviliaApp() {
         {activeScreen === "adm" && admLoggedIn && (
           <AdmScreen
             bookings={bookings}
+            services={services}
             onUpdateBooking={handleUpdateBooking}
             onCancelBooking={handleCancelBooking}
+            onUpdateServices={setServices}
             onLogout={() => { setAdmLoggedIn(false); setActiveScreen("home") }}
           />
         )}

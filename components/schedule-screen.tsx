@@ -5,9 +5,18 @@ import { ArrowLeft, Check, Scissors, Clock, CalendarDays } from "lucide-react"
 import { format, addDays, isSameDay } from "date-fns"
 import { ptBR } from "date-fns/locale"
 
+export interface ServiceItem {
+  id: string
+  name: string
+  desc: string
+  price: string
+  duration: string
+}
+
 interface ScheduleScreenProps {
   onBack: () => void
   onConfirm: (booking: BookingData) => void
+  services?: ServiceItem[]
 }
 
 export interface BookingData {
@@ -20,42 +29,12 @@ export interface BookingData {
   status?: "active" | "cancelled" | "rescheduled"
 }
 
-const SERVICES = [
-  {
-    id: "corte",
-    name: "Corte Classico",
-    desc: "Corte masculino com tesoura e maquina",
-    price: "R$ 45",
-    duration: "40 min",
-  },
-  {
-    id: "barba",
-    name: "Barba Completa",
-    desc: "Barba com toalha quente e navalha",
-    price: "R$ 35",
-    duration: "30 min",
-  },
-  {
-    id: "combo",
-    name: "Combo Premium",
-    desc: "Corte + Barba + Toalha quente",
-    price: "R$ 70",
-    duration: "60 min",
-  },
-  {
-    id: "sobrancelha",
-    name: "Design Sobrancelha",
-    desc: "Alinhamento e limpeza com navalha",
-    price: "R$ 20",
-    duration: "15 min",
-  },
-  {
-    id: "hidratacao",
-    name: "Hidratacao Capilar",
-    desc: "Tratamento profundo para cabelos",
-    price: "R$ 50",
-    duration: "45 min",
-  },
+export const DEFAULT_SERVICES: ServiceItem[] = [
+  { id: "corte", name: "Corte Classico", desc: "Corte masculino com tesoura e maquina", price: "R$ 45", duration: "40 min" },
+  { id: "barba", name: "Barba Completa", desc: "Barba com toalha quente e navalha", price: "R$ 35", duration: "30 min" },
+  { id: "combo", name: "Combo Premium", desc: "Corte + Barba + Toalha quente", price: "R$ 70", duration: "60 min" },
+  { id: "sobrancelha", name: "Design Sobrancelha", desc: "Alinhamento e limpeza com navalha", price: "R$ 20", duration: "15 min" },
+  { id: "hidratacao", name: "Hidratacao Capilar", desc: "Tratamento profundo para cabelos", price: "R$ 50", duration: "45 min" },
 ]
 
 const TIME_SLOTS = [
@@ -70,7 +49,8 @@ const TAKEN_SLOTS = ["10:00", "14:00", "15:30", "18:00"]
 
 type Step = 1 | 2 | 3 | 4 | 5
 
-export function ScheduleScreen({ onBack, onConfirm }: ScheduleScreenProps) {
+export function ScheduleScreen({ onBack, onConfirm, services: servicesProp }: ScheduleScreenProps) {
+  const SERVICES = servicesProp ?? DEFAULT_SERVICES
   const [step, setStep] = useState<Step>(1)
   const [selectedService, setSelectedService] = useState<string | null>(null)
   const [selectedDate, setSelectedDate] = useState<Date | null>(null)

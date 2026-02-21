@@ -3,26 +3,17 @@
 import { useState } from "react"
 import { format } from "date-fns"
 import { ptBR } from "date-fns/locale"
-import { LogOut, Pencil, Trash2, MessageCircle, Check, X, CalendarDays, AlertCircle } from "lucide-react"
-import type { BookingData } from "./schedule-screen"
+import { LogOut, Pencil, Trash2, MessageCircle, Check, X, CalendarDays, AlertCircle, ChevronDown, ChevronUp, Plus } from "lucide-react"
+import type { BookingData, ServiceItem } from "./schedule-screen"
 
 interface AdmScreenProps {
   bookings: BookingData[]
+  services: ServiceItem[]
   onUpdateBooking: (index: number, updated: BookingData) => void
   onCancelBooking: (index: number) => void
+  onUpdateServices: (services: ServiceItem[]) => void
   onLogout: () => void
 }
-
-const SERVICES_LIST = [
-  { name: "Corte Classico", price: "R$ 45" },
-  { name: "Barba Completa", price: "R$ 35" },
-  { name: "Combo Premium", price: "R$ 70" },
-  { name: "Design Sobrancelha", price: "R$ 20" },
-  { name: "Hidratacao Capilar", price: "R$ 50" },
-  { name: "Corte + Barba", price: "R$ 65" },
-  { name: "Bigode", price: "R$ 15" },
-  { name: "Pigmentacao Barba", price: "R$ 40" },
-]
 
 const TIME_SLOTS = [
   "09:00","09:30","10:00","10:30","11:00","11:30",
@@ -31,10 +22,43 @@ const TIME_SLOTS = [
   "18:30","19:00","19:30",
 ]
 
-export function AdmScreen({ bookings, onUpdateBooking, onCancelBooking, onLogout }: AdmScreenProps) {
+export function AdmScreen({ bookings, services, onUpdateBooking, onCancelBooking, onUpdateServices, onLogout }: AdmScreenProps) {
   const [editingIndex, setEditingIndex] = useState<number | null>(null)
   const [editData, setEditData] = useState<Partial<BookingData>>({})
   const [confirmCancel, setConfirmCancel] = useState<number | null>(null)
+  const [showServicesPanel, setShowServicesPanel] = useState(false)
+  const [editingService, setEditingService] = useState<number | null>(null)
+  const [serviceEdit, setServiceEdit] = useState<Partial<ServiceItem>>({})
+
+  function startServiceEdit(i: number) {
+    setEditingService(i)
+    setServiceEdit({ ...services[i] })
+  }
+
+  function saveServiceEdit() {
+    if (editingService !== null) {
+      const updated = services.map((s, i) => i === editingService ? { ...s, ...serviceEdit } : s)
+      onUpdateServices(updated)
+      setEditingService(null)
+    }
+  }
+
+  function addService() {
+    const newSvc: ServiceItem = {
+      id: `svc-${Date.now()}`,
+      name: "Novo Serviço",
+      desc: "Descrição do serviço",
+      price: "R$ 0",
+      duration: "30 min",
+    }
+    onUpdateServices([...services, newSvc])
+    setEditingService(services.length)
+    setServiceEdit({ ...newSvc })
+  }
+
+  function removeService(i: number) {
+    onUpdateServices(services.filter((_, idx) => idx !== i))
+  }
 
   function startEdit(index: number) {
     setEditingIndex(index)
@@ -70,25 +94,118 @@ export function AdmScreen({ bookings, onUpdateBooking, onCancelBooking, onLogout
   return (
     <div className="flex min-h-screen flex-col pb-24">
       {/* Header */}
-      <header className="sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur-md px-4 py-4 flex items-center justify-between">
-        <div>
-          <h1 className="font-serif text-lg font-bold" style={{
-            background: "linear-gradient(180deg, #f5cc50 0%, #d4a017 45%, #f0bc2a 70%, #a87c0e 100%)",
-            WebkitBackgroundClip: "text",
-            WebkitTextFillColor: "transparent",
-            backgroundClip: "text",
-          }}>
-            Painel ADM
-          </h1>
-          <p className="text-[10px] text-muted-foreground uppercase tracking-wider">CAVILIA Studio Club</p>
+      <header className="sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur-md">
+        <div className="px-4 py-4 flex items-center justify-between">
+          <div>
+            <h1 className="font-serif text-lg font-bold" style={{
+              background: "linear-gradient(180deg, #f5cc50 0%, #d4a017 45%, #f0bc2a 70%, #a87c0e 100%)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              backgroundClip: "text",
+            }}>
+              Painel ADM
+            </h1>
+            <p className="text-[10px] text-muted-foreground uppercase tracking-wider">CAVILIA Studio Club</p>
+          </div>
+          <div className="flex items-center gap-2">
+            {/* Botão Gerenciar Serviços */}
+            <button
+              onClick={() => setShowServicesPanel(!showServicesPanel)}
+              className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-medium transition-all"
+              style={{
+                border: showServicesPanel ? "1.5px solid #d4a017" : "1.5px solid rgba(212,160,23,0.3)",
+                color: showServicesPanel ? "#d4a017" : "rgba(212,160,23,0.6)",
+                background: showServicesPanel ? "rgba(212,160,23,0.08)" : "transparent",
+              }}
+            >
+              <Pencil className="h-3.5 w-3.5" />
+              Serviços
+              {showServicesPanel ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
+            </button>
+            <button
+              onClick={onLogout}
+              className="flex items-center gap-1.5 rounded-lg border border-border px-3 py-2 text-xs text-muted-foreground transition-colors hover:border-red-500/40 hover:text-red-400"
+            >
+              <LogOut className="h-3.5 w-3.5" />
+              Sair
+            </button>
+          </div>
         </div>
-        <button
-          onClick={onLogout}
-          className="flex items-center gap-1.5 rounded-lg border border-border px-3 py-2 text-xs text-muted-foreground transition-colors hover:border-red-500/40 hover:text-red-400"
-        >
-          <LogOut className="h-3.5 w-3.5" />
-          Sair
-        </button>
+
+        {/* Painel de Serviços */}
+        {showServicesPanel && (
+          <div className="border-t border-border/50 bg-background/98 px-4 pb-4 pt-3">
+            <div className="mb-3 flex items-center justify-between">
+              <p className="text-xs font-semibold uppercase tracking-wider text-gold">Gerenciar Serviços</p>
+              <button
+                onClick={addService}
+                className="flex items-center gap-1 rounded-lg border border-gold/30 bg-gold/10 px-2.5 py-1.5 text-[10px] font-medium text-gold hover:bg-gold/20"
+              >
+                <Plus className="h-3 w-3" /> Adicionar
+              </button>
+            </div>
+            <div className="flex flex-col gap-2 max-h-64 overflow-y-auto">
+              {services.map((svc, i) => (
+                <div key={svc.id} className="rounded-lg border border-border bg-card overflow-hidden">
+                  {editingService === i ? (
+                    <div className="flex flex-col gap-2 p-3">
+                      <input
+                        value={serviceEdit.name || ""}
+                        onChange={(e) => setServiceEdit({ ...serviceEdit, name: e.target.value })}
+                        placeholder="Nome do serviço"
+                        className="w-full rounded border border-border bg-secondary px-2.5 py-1.5 text-xs text-foreground focus:border-gold focus:outline-none"
+                      />
+                      <input
+                        value={serviceEdit.desc || ""}
+                        onChange={(e) => setServiceEdit({ ...serviceEdit, desc: e.target.value })}
+                        placeholder="Descrição"
+                        className="w-full rounded border border-border bg-secondary px-2.5 py-1.5 text-xs text-foreground focus:border-gold focus:outline-none"
+                      />
+                      <div className="grid grid-cols-2 gap-2">
+                        <input
+                          value={serviceEdit.price || ""}
+                          onChange={(e) => setServiceEdit({ ...serviceEdit, price: e.target.value })}
+                          placeholder="Preço (ex: R$ 45)"
+                          className="w-full rounded border border-border bg-secondary px-2.5 py-1.5 text-xs text-foreground focus:border-gold focus:outline-none"
+                        />
+                        <input
+                          value={serviceEdit.duration || ""}
+                          onChange={(e) => setServiceEdit({ ...serviceEdit, duration: e.target.value })}
+                          placeholder="Duração (ex: 40 min)"
+                          className="w-full rounded border border-border bg-secondary px-2.5 py-1.5 text-xs text-foreground focus:border-gold focus:outline-none"
+                        />
+                      </div>
+                      <div className="flex gap-2">
+                        <button onClick={saveServiceEdit} className="flex flex-1 items-center justify-center gap-1 rounded border border-gold/40 bg-gold/15 py-1.5 text-[10px] font-medium text-gold hover:bg-gold/25">
+                          <Check className="h-3 w-3" /> Salvar
+                        </button>
+                        <button onClick={() => setEditingService(null)} className="flex flex-1 items-center justify-center gap-1 rounded border border-border py-1.5 text-[10px] font-medium text-muted-foreground hover:bg-secondary">
+                          <X className="h-3 w-3" /> Cancelar
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-between px-3 py-2.5">
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-semibold text-foreground truncate">{svc.name}</p>
+                        <p className="text-[10px] text-muted-foreground truncate">{svc.desc} • {svc.duration}</p>
+                      </div>
+                      <div className="flex items-center gap-2 ml-2">
+                        <span className="text-xs font-bold text-gold">{svc.price}</span>
+                        <button onClick={() => startServiceEdit(i)} className="text-muted-foreground hover:text-gold">
+                          <Pencil className="h-3.5 w-3.5" />
+                        </button>
+                        <button onClick={() => removeService(i)} className="text-muted-foreground hover:text-red-400">
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </header>
 
       {/* Stats */}
@@ -136,6 +253,7 @@ export function AdmScreen({ bookings, onUpdateBooking, onCancelBooking, onLogout
                       globalIndex={bookings.indexOf(b)}
                       isEditing={editingIndex === bookings.indexOf(b)}
                       editData={editData}
+                      services={services}
                       onEdit={() => startEdit(bookings.indexOf(b))}
                       onSave={saveEdit}
                       onCancelEdit={() => setEditingIndex(null)}
@@ -164,6 +282,7 @@ export function AdmScreen({ bookings, onUpdateBooking, onCancelBooking, onLogout
                         globalIndex={gi}
                         isEditing={editingIndex === gi}
                         editData={editData}
+                        services={services}
                         onEdit={() => startEdit(gi)}
                         onSave={saveEdit}
                         onCancelEdit={() => setEditingIndex(null)}
@@ -192,6 +311,7 @@ export function AdmScreen({ bookings, onUpdateBooking, onCancelBooking, onLogout
                         globalIndex={gi}
                         isEditing={false}
                         editData={{}}
+                        services={services}
                         onEdit={() => {}}
                         onSave={() => {}}
                         onCancelEdit={() => {}}
@@ -244,6 +364,7 @@ interface BookingCardProps {
   globalIndex: number
   isEditing: boolean
   editData: Partial<BookingData>
+  services: ServiceItem[]
   onEdit: () => void
   onSave: () => void
   onCancelEdit: () => void
@@ -254,7 +375,7 @@ interface BookingCardProps {
 }
 
 function BookingCard({
-  booking, isEditing, editData, onEdit, onSave, onCancelEdit,
+  booking, isEditing, editData, services, onEdit, onSave, onCancelEdit,
   onDelete, onWhatsApp, onEditDataChange, isPast
 }: BookingCardProps) {
   const isCancelled = booking.status === "cancelled"
@@ -340,8 +461,8 @@ function BookingCard({
               }}
               className="w-full rounded-lg border border-border bg-secondary px-3 py-2 text-sm text-foreground focus:border-gold focus:outline-none"
             >
-              {SERVICES_LIST.map(s => (
-                <option key={s.name} value={s.name}>{s.name} — {s.price}</option>
+              {services.map(s => (
+                <option key={s.id} value={s.name}>{s.name} — {s.price}</option>
               ))}
             </select>
           </div>
