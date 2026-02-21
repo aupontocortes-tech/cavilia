@@ -159,3 +159,23 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Título CAVILIA com hover vibrante */
+.cavilia-title {
+  background: linear-gradient(180deg, #f5cc50 0%, #d4a017 40%, #f0bc2a 60%, #a87c0e 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 0 10px rgba(212,160,23,0.6));
+  transition: filter 0.25s ease, transform 0.25s ease;
+  cursor: default;
+}
+
+.cavilia-title:hover {
+  background: linear-gradient(180deg, #fff0a0 0%, #f5cc50 25%, #ffdf00 55%, #d4a017 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 0 18px rgba(255,220,0,0.95)) drop-shadow(0 0 6px rgba(255,200,0,0.8));
+  transform: scale(1.03);
+}

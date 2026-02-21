@@ -10,16 +10,7 @@ export function HomeScreen({ onNavigate }: HomeScreenProps) {
   return (
     <div className="relative flex min-h-screen flex-col items-center justify-center px-6 pb-24">
       {/* CAVILIA: grande, dourado, brilho metálico */}
-      <h1
-        className="mb-0 font-serif text-6xl font-bold tracking-[0.14em]"
-        style={{
-          background: "linear-gradient(180deg, #f0bc2a 0%, #d4a017 40%, #f5cc50 60%, #a87c0e 100%)",
-          WebkitBackgroundClip: "text",
-          WebkitTextFillColor: "transparent",
-          backgroundClip: "text",
-          filter: "drop-shadow(0 0 10px rgba(212,160,23,0.6))",
-        }}
-      >
+      <h1 className="cavilia-title mb-0 font-serif text-6xl font-bold tracking-[0.14em]">
         CAVILIA
       </h1>
       {/* — STUDIO CLUB 1998 — com linhas douradas */}
