@@ -16,22 +16,14 @@ export function HomeScreen({ onNavigate }: HomeScreenProps) {
       {/* — STUDIO CLUB 1998 — com linhas douradas */}
       <div className="mt-2 mb-8 flex items-center gap-2">
         <span className="text-gold/80">—</span>
-        <span
-          className="font-sans text-[13px] font-medium tracking-[0.28em] uppercase"
-          style={{
-            background: "linear-gradient(180deg, #f0bc2a 0%, #d4a017 50%, #f5cc50 100%)",
-            WebkitBackgroundClip: "text",
-            WebkitTextFillColor: "transparent",
-            backgroundClip: "text",
-          }}
-        >
+        <span className="studio-subtitle font-sans text-[13px] font-medium tracking-[0.28em] uppercase">
           Studio Club 1998
         </span>
         <span className="text-gold/80">—</span>
       </div>
 
       {/* Emblema circular central: cavalo e ferradura */}
-      <div className="relative mb-12 flex-shrink-0" style={{ padding: 4, borderRadius: '9999px', background: 'conic-gradient(from 0deg, #f5cc6a 0%, #e8b84b 18%, #c49a2e 35%, #fff3b0 50%, #c49a2e 65%, #e8b84b 82%, #f5cc6a 100%)', boxShadow: '0 0 18px 4px rgba(232,184,75,0.45), 0 0 6px 1px rgba(255,243,176,0.3)' }}>
+      <div className="emblem-ring relative mb-12 flex-shrink-0">
         <div className="flex h-36 w-36 items-center justify-center rounded-full bg-black">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img

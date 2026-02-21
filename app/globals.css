@@ -160,6 +160,41 @@
   }
 }
 
+/* Subtítulo Studio Club 1998 com hover vibrante */
+.studio-subtitle {
+  background: linear-gradient(180deg, #f0bc2a 0%, #d4a017 50%, #f5cc50 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  transition: filter 0.25s ease;
+  cursor: default;
+}
+
+.studio-subtitle:hover {
+  background: linear-gradient(180deg, #fff0a0 0%, #f5cc50 40%, #ffdf00 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 0 10px rgba(255,220,0,0.9));
+}
+
+/* Anel dourado do emblema com hover vibrante */
+.emblem-ring {
+  padding: 4px;
+  border-radius: 9999px;
+  background: conic-gradient(from 0deg, #f5cc6a 0%, #e8b84b 18%, #c49a2e 35%, #fff3b0 50%, #c49a2e 65%, #e8b84b 82%, #f5cc6a 100%);
+  box-shadow: 0 0 18px 4px rgba(212,160,23,0.45), 0 0 6px 1px rgba(255,243,176,0.3);
+  transition: box-shadow 0.25s ease, filter 0.25s ease, transform 0.25s ease;
+  cursor: pointer;
+}
+
+.emblem-ring:hover {
+  background: conic-gradient(from 0deg, #fff0a0 0%, #ffdf00 18%, #f5cc50 35%, #ffffff 50%, #f5cc50 65%, #ffdf00 82%, #fff0a0 100%);
+  box-shadow: 0 0 30px 8px rgba(255,220,0,0.8), 0 0 12px 3px rgba(255,243,100,0.7), 0 0 50px 10px rgba(212,160,23,0.4);
+  filter: brightness(1.2);
+  transform: scale(1.05);
+}
+
 /* Título CAVILIA com hover vibrante */
 .cavilia-title {
   background: linear-gradient(180deg, #f5cc50 0%, #d4a017 40%, #f0bc2a 60%, #a87c0e 100%);
