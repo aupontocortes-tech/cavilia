@@ -12,7 +12,7 @@ export function HomeScreen({ onNavigate }: HomeScreenProps) {
   const [clickCount, setClickCount] = useState(0)
 
   function handleCoinClick() {
-    if (flipClass) return // já girando
+    if (flipClass && flipClass !== "showing-back") return // já girando
 
     if (side === "cowboy") {
       // clique no cowboy → gira de volta pro cavalo e reseta
