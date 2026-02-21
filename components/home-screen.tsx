@@ -93,10 +93,18 @@ export function HomeScreen({ onNavigate }: HomeScreenProps) {
             <img
               src="/images/cowboy-coin.png"
               alt="CAVILIA - Cowboy"
-              className="rounded-full object-cover object-center"
-              style={{ width: "125%", height: "125%", marginLeft: "-12.5%", marginTop: "-12.5%" }}
-              width={180}
-              height={180}
+              style={{
+                position: "absolute",
+                width: "150%",
+                height: "150%",
+                top: "50%",
+                left: "50%",
+                transform: "translate(-50%, -46%)",
+                objectFit: "cover",
+                borderRadius: "9999px",
+              }}
+              width={216}
+              height={216}
             />
           </div>
         </div>
