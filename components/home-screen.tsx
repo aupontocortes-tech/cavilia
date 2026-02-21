@@ -88,14 +88,15 @@ export function HomeScreen({ onNavigate }: HomeScreenProps) {
             />
           </div>
           {/* Verso: Cowboy */}
-          <div className="coin-face coin-face-back bg-black">
+          <div className="coin-face coin-face-back overflow-hidden" style={{ background: "#000" }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/images/cowboy-coin.png"
               alt="CAVILIA - Cowboy"
-              className="h-full w-full rounded-full object-cover object-center"
-              width={144}
-              height={144}
+              className="rounded-full object-cover object-center"
+              style={{ width: "125%", height: "125%", marginLeft: "-12.5%", marginTop: "-12.5%" }}
+              width={180}
+              height={180}
             />
           </div>
         </div>
