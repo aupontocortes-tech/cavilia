@@ -1,12 +1,26 @@
 "use client"
-// Para trocar o ícone: substitua o arquivo public/images/emblem.png pela sua imagem.
-// Para ajustar o layout: veja COMO-PERSONALIZAR.md na raiz do projeto.
+
+import { useState } from "react"
 
 interface HomeScreenProps {
   onNavigate: (screen: "schedule" | "profile") => void
 }
 
 export function HomeScreen({ onNavigate }: HomeScreenProps) {
+  const [side, setSide] = useState<"horse" | "cowboy">("horse")
+  const [flipClass, setFlipClass] = useState("")
+
+  function handleCoinClick() {
+    if (flipClass) return // já girando
+    const landOn = Math.random() < 0.5 ? "horse" : "cowboy"
+    const animClass = landOn === "cowboy" ? "flipping-to-back" : "flipping-to-front"
+    setFlipClass(animClass)
+    setTimeout(() => {
+      setSide(landOn)
+      setFlipClass("")
+    }, 1400)
+  }
+
   return (
     <div className="relative flex min-h-screen flex-col items-center justify-center px-6 pb-24">
       {/* CAVILIA: grande, dourado, brilho metálico */}
@@ -22,17 +36,31 @@ export function HomeScreen({ onNavigate }: HomeScreenProps) {
         <span className="text-gold/80">—</span>
       </div>
 
-      {/* Emblema circular central: cavalo e ferradura */}
-      <div className="emblem-ring relative mb-12 flex-shrink-0">
-        <div className="flex h-36 w-36 items-center justify-center rounded-full bg-black">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/images/emblem.png"
-            alt="CAVILIA - Cavalo e Ferradura"
-            className="h-full w-full rounded-full object-contain object-center"
-            width={144}
-            height={144}
-          />
+      {/* Emblema circular central — clique para girar a moeda */}
+      <div className="emblem-ring coin-scene relative mb-12 flex-shrink-0" onClick={handleCoinClick} style={{ cursor: flipClass ? "default" : "pointer" }}>
+        <div className={`coin-card ${flipClass}`}>
+          {/* Frente: Cavalo */}
+          <div className="coin-face bg-black">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/images/emblem.png"
+              alt="CAVILIA - Cavalo e Ferradura"
+              className="h-full w-full rounded-full object-contain object-center"
+              width={144}
+              height={144}
+            />
+          </div>
+          {/* Verso: Cowboy */}
+          <div className="coin-face coin-face-back bg-black">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/images/cowboy-coin.png"
+              alt="CAVILIA - Cowboy"
+              className="h-full w-full rounded-full object-cover object-center"
+              width={144}
+              height={144}
+            />
+          </div>
         </div>
       </div>
 

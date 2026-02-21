@@ -160,6 +160,49 @@
   }
 }
 
+/* Animação de moeda girando */
+@keyframes coin-flip-to-back {
+  0%   { transform: rotateY(0deg); }
+  100% { transform: rotateY(900deg); }
+}
+
+@keyframes coin-flip-to-front {
+  0%   { transform: rotateY(0deg); }
+  100% { transform: rotateY(720deg); }
+}
+
+.coin-scene {
+  perspective: 600px;
+}
+
+.coin-card {
+  position: relative;
+  width: 144px;
+  height: 144px;
+  transform-style: preserve-3d;
+  transition: none;
+}
+
+.coin-card.flipping-to-back {
+  animation: coin-flip-to-back 1.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.coin-card.flipping-to-front {
+  animation: coin-flip-to-front 1.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.coin-face {
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.coin-face-back {
+  transform: rotateY(180deg);
+}
+
 /* Subtítulo Studio Club 1998 com hover vibrante */
 .studio-subtitle {
   background: linear-gradient(180deg, #f0bc2a 0%, #d4a017 50%, #f5cc50 100%);
