@@ -77,14 +77,15 @@ export function HomeScreen({ onNavigate }: HomeScreenProps) {
         <div className="emblem-ring" onClick={handleCoinClick} style={{ cursor: flipClass ? "default" : "pointer" }}>
         <div className={`coin-card ${flipClass}`}>
           {/* Frente: Cavalo */}
-          <div className="coin-face bg-black">
+          <div className="coin-face bg-black overflow-hidden">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/images/emblem.png"
               alt="CAVILIA - Cavalo e Ferradura"
-              className="h-full w-full rounded-full object-contain object-center"
-              width={144}
-              height={144}
+              className="rounded-full object-contain object-center"
+              style={{ width: "133%", height: "133%", marginLeft: "0%", marginTop: "-10%" }}
+              width={192}
+              height={192}
             />
           </div>
           {/* Verso: Cowboy */}
