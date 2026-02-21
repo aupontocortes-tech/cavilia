@@ -46,7 +46,7 @@ export function AdmLoginScreen({ onLogin }: AdmLoginScreenProps) {
               WebkitTextFillColor: "transparent",
               backgroundClip: "text",
             }}>
-              ADN
+              ADM
             </h1>
             <p className="mt-0.5 text-xs tracking-widest uppercase text-gold/60">Área Restrita</p>
           </div>

@@ -14,7 +14,7 @@ export function BottomNav({ activeScreen, onNavigate }: BottomNavProps) {
     { id: "home", label: "Início", icon: Home },
     { id: "schedule", label: "Agendar", icon: CalendarDays },
     { id: "profile", label: "Perfil", icon: User },
-    { id: "adm", label: "ADN", icon: ShieldCheck },
+    { id: "adm", label: "ADM", icon: ShieldCheck },
   ]
 
   return (

@@ -78,7 +78,7 @@ export function AdmScreen({ bookings, onUpdateBooking, onCancelBooking, onLogout
             WebkitTextFillColor: "transparent",
             backgroundClip: "text",
           }}>
-            Painel ADN
+            Painel ADM
           </h1>
           <p className="text-[10px] text-muted-foreground uppercase tracking-wider">CAVILIA Studio Club</p>
         </div>
