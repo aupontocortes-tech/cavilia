@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Lock, Eye, EyeOff, ShieldCheck } from "lucide-react"
 
 interface AdmLoginScreenProps {
@@ -11,11 +11,30 @@ export function AdmLoginScreen({ onLogin }: AdmLoginScreenProps) {
   const [user, setUser] = useState("")
   const [pass, setPass] = useState("")
   const [showPass, setShowPass] = useState(false)
+  const [rememberMe, setRememberMe] = useState(false)
   const [error, setError] = useState(false)
+
+  // Carrega credenciais salvas ao abrir
+  useEffect(() => {
+    const saved = localStorage.getItem("cavilia-adm-saved")
+    if (saved) {
+      try {
+        const { user: u, pass: p } = JSON.parse(saved)
+        setUser(u || "")
+        setPass(p || "")
+        setRememberMe(true)
+      } catch {}
+    }
+  }, [])
 
   function handleLogin() {
     if (user.toLowerCase() === "cavilia" && pass === "0000") {
       setError(false)
+      if (rememberMe) {
+        localStorage.setItem("cavilia-adm-saved", JSON.stringify({ user, pass }))
+      } else {
+        localStorage.removeItem("cavilia-adm-saved")
+      }
       onLogin()
     } else {
       setError(true)
@@ -89,6 +108,31 @@ export function AdmLoginScreen({ onLogin }: AdmLoginScreenProps) {
             </div>
           </div>
 
+          {/* Lembrar senha */}
+          <button
+            onClick={() => setRememberMe(!rememberMe)}
+            className="flex items-center gap-2.5 self-start"
+          >
+            <div
+              className="flex h-5 w-5 items-center justify-center rounded"
+              style={{
+                border: rememberMe ? "2px solid #d4a017" : "2px solid rgba(212,160,23,0.3)",
+                background: rememberMe ? "rgba(212,160,23,0.15)" : "transparent",
+                transition: "all 0.2s",
+                boxShadow: rememberMe ? "0 0 6px rgba(212,160,23,0.4)" : "none",
+              }}
+            >
+              {rememberMe && (
+                <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
+                  <path d="M1 4L3.5 6.5L9 1" stroke="#d4a017" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              )}
+            </div>
+            <span className="text-xs text-muted-foreground" style={{ color: rememberMe ? "#d4a017" : undefined }}>
+              Lembrar senha
+            </span>
+          </button>
+
           {error && (
             <p className="text-center text-xs text-red-400">Usuário ou senha incorretos</p>
           )}
@@ -102,13 +146,13 @@ export function AdmLoginScreen({ onLogin }: AdmLoginScreenProps) {
               boxShadow: "0 0 12px 3px rgba(212,160,23,0.4)",
             }}
           >
+            <Lock className="h-4 w-4" style={{ color: "#d4a017" }} />
             <span style={{
               background: "linear-gradient(180deg, #f5cc50 0%, #d4a017 45%, #f0bc2a 70%, #a87c0e 100%)",
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
               backgroundClip: "text",
             }}>
-              <Lock className="inline h-4 w-4 mr-2" style={{ WebkitTextFillColor: "#d4a017" }} />
               Entrar
             </span>
           </button>
