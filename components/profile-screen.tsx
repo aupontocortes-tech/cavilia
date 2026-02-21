@@ -1,42 +1,87 @@
 "use client"
 
-import { useState } from "react"
-import { CalendarDays, Clock, X, Scissors, ChevronRight } from "lucide-react"
+import { useState, useRef } from "react"
+import { CalendarDays, Clock, X, Scissors, ChevronRight, Camera, LogOut, User } from "lucide-react"
 import { format } from "date-fns"
 import { ptBR } from "date-fns/locale"
 import type { BookingData } from "./schedule-screen"
-import { HorseLogo } from "./horse-logo"
+import type { UserData } from "./auth-screen"
 
 interface ProfileScreenProps {
   bookings: BookingData[]
+  user: UserData | null
   onCancelBooking: (index: number) => void
+  onUpdateUser: (user: UserData) => void
+  onLogout: () => void
 }
 
-export function ProfileScreen({ bookings, onCancelBooking }: ProfileScreenProps) {
+export function ProfileScreen({ bookings, user, onCancelBooking, onUpdateUser, onLogout }: ProfileScreenProps) {
   const [showCancelDialog, setShowCancelDialog] = useState<number | null>(null)
+  const photoInputRef = useRef<HTMLInputElement>(null)
 
-  const upcomingBookings = bookings.filter((b) => b.date >= new Date())
-  const pastBookings = bookings.filter((b) => b.date < new Date())
+  const upcomingBookings = bookings.filter((b) => b.status !== "cancelled" && b.date >= new Date())
+  const pastBookings = bookings.filter((b) => b.status !== "cancelled" && b.date < new Date())
 
   function handleCancel(index: number) {
     onCancelBooking(index)
     setShowCancelDialog(null)
   }
 
+  function handlePhotoChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file || !user) return
+    const reader = new FileReader()
+    reader.onload = (ev) => {
+      const updated = { ...user, photoUrl: ev.target?.result as string }
+      // Atualiza no localStorage
+      const raw = localStorage.getItem("cavilia-users")
+      const users: UserData[] = raw ? JSON.parse(raw) : []
+      const idx = users.findIndex((u) => u.phone === user.phone)
+      if (idx >= 0) users[idx] = updated
+      localStorage.setItem("cavilia-users", JSON.stringify(users))
+      localStorage.setItem("cavilia-current-user", JSON.stringify(updated))
+      onUpdateUser(updated)
+    }
+    reader.readAsDataURL(file)
+  }
+
+  const joinYear = new Date().getFullYear()
+
   return (
     <div className="flex min-h-screen flex-col pb-24">
       {/* Header */}
-      <header className="border-b border-border px-4 pb-6 pt-12 flex flex-col items-center text-center">
-        <div className="mb-3 flex-shrink-0" style={{ width: 86, height: 86, padding: 3, borderRadius: '9999px', background: 'conic-gradient(from 0deg, #f5cc6a 0%, #e8b84b 18%, #c49a2e 35%, #fff3b0 50%, #c49a2e 65%, #e8b84b 82%, #f5cc6a 100%)', boxShadow: '0 0 18px 4px rgba(232,184,75,0.45), 0 0 6px 1px rgba(255,243,176,0.3)' }}>
-          <div className="flex h-full w-full items-center justify-center rounded-full bg-black overflow-hidden">
-            <img src="/logo-cavilia.png" alt="Cavilia Logo" className="h-full w-full object-contain" />
+      <header className="border-b border-border px-4 pb-6 pt-10 flex flex-col items-center text-center">
+        {/* Foto de perfil com botão de trocar */}
+        <div className="relative mb-3">
+          <div className="flex-shrink-0" style={{ width: 86, height: 86, padding: 3, borderRadius: '9999px', background: 'conic-gradient(from 0deg, #f5cc6a 0%, #e8b84b 18%, #c49a2e 35%, #fff3b0 50%, #c49a2e 65%, #e8b84b 82%, #f5cc6a 100%)', boxShadow: '0 0 18px 4px rgba(232,184,75,0.45)' }}>
+            <div className="flex h-full w-full items-center justify-center rounded-full bg-black overflow-hidden">
+              {user?.photoUrl
+                ? <img src={user.photoUrl} alt="Foto perfil" className="h-full w-full object-cover" />
+                : user
+                  ? <span className="font-serif text-2xl font-bold text-gold">{user.name.charAt(0).toUpperCase()}</span>
+                  : <img src="/logo-cavilia.png" alt="Cavilia Logo" className="h-full w-full object-contain" />
+              }
+            </div>
           </div>
+          {user && (
+            <button
+              onClick={() => photoInputRef.current?.click()}
+              className="absolute -bottom-1 -right-1 flex h-7 w-7 items-center justify-center rounded-full bg-gold shadow-md hover:brightness-110"
+            >
+              <Camera className="h-3.5 w-3.5 text-black" />
+            </button>
+          )}
+          <input ref={photoInputRef} type="file" accept="image/*" className="hidden" onChange={handlePhotoChange} />
         </div>
+
         <h1 className="font-serif text-xl font-bold text-foreground">
-          Meu Perfil
+          {user ? user.name : "Meu Perfil"}
         </h1>
-        <p className="mt-1 text-xs text-muted-foreground">
-          Membro desde 2024
+        {user?.phone && (
+          <p className="mt-0.5 text-xs text-muted-foreground">{user.phone}</p>
+        )}
+        <p className="mt-0.5 text-xs text-muted-foreground">
+          Membro desde {joinYear}
         </p>
         <div className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-gold/30 bg-gold/10 px-3 py-1">
           <div className="h-1.5 w-1.5 rounded-full bg-gold" />
@@ -44,6 +89,15 @@ export function ProfileScreen({ bookings, onCancelBooking }: ProfileScreenProps)
             Cliente VIP
           </span>
         </div>
+        {user && (
+          <button
+            onClick={onLogout}
+            className="mt-3 flex items-center gap-1.5 text-xs text-muted-foreground/60 hover:text-red-400 transition-colors"
+          >
+            <LogOut className="h-3.5 w-3.5" />
+            Sair da conta
+          </button>
+        )}
       </header>
 
       {/* Stats */}

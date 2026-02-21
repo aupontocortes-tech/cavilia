@@ -187,8 +187,8 @@
 
 .coin-card {
   position: relative;
-  width: 144px;
-  height: 144px;
+  width: 124px;
+  height: 124px;
   transform-style: preserve-3d;
   transition: none;
 }

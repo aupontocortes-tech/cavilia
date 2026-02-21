@@ -7,6 +7,7 @@ import { ProfileScreen } from "@/components/profile-screen"
 import { SuccessScreen } from "@/components/success-screen"
 import { AdmLoginScreen } from "@/components/adm-login-screen"
 import { AdmScreen } from "@/components/adm-screen"
+import { AuthScreen, type UserData } from "@/components/auth-screen"
 import { BottomNav } from "@/components/bottom-nav"
 
 type Screen = "home" | "schedule" | "profile" | "adm"
@@ -18,11 +19,23 @@ export default function CaviliaApp() {
   const [showSuccess, setShowSuccess] = useState(false)
   const [admLoggedIn, setAdmLoggedIn] = useState(false)
   const [services, setServices] = useState<ServiceItem[]>(DEFAULT_SERVICES)
+  const [currentUser, setCurrentUser] = useState<UserData | null>(() => {
+    if (typeof window === "undefined") return null
+    const saved = localStorage.getItem("cavilia-current-user")
+    return saved ? JSON.parse(saved) : null
+  })
+  const [showAuth, setShowAuth] = useState(false)
 
   function handleNavigate(screen: Screen) {
     setShowSuccess(false)
     if (screen !== "adm") setAdmLoggedIn(false)
     setActiveScreen(screen)
+    // Ao clicar em Agendar, verifica se tem usuário logado
+    if (screen === "schedule" && !currentUser) {
+      setShowAuth(true)
+    } else {
+      setShowAuth(false)
+    }
   }
 
   function handleConfirmBooking(booking: BookingData) {
@@ -62,7 +75,13 @@ export default function CaviliaApp() {
         {activeScreen === "home" && (
           <HomeScreen onNavigate={handleNavigate} />
         )}
-        {activeScreen === "schedule" && (
+        {activeScreen === "schedule" && showAuth && (
+          <AuthScreen
+            onAuth={(user) => { setCurrentUser(user); setShowAuth(false) }}
+            onBack={() => { setShowAuth(false); setActiveScreen("home") }}
+          />
+        )}
+        {activeScreen === "schedule" && !showAuth && (
           <ScheduleScreen
             onBack={() => setActiveScreen("home")}
             onConfirm={handleConfirmBooking}
@@ -72,7 +91,14 @@ export default function CaviliaApp() {
         {activeScreen === "profile" && (
           <ProfileScreen
             bookings={bookings}
+            user={currentUser}
             onCancelBooking={handleCancelBooking}
+            onUpdateUser={(u) => setCurrentUser(u)}
+            onLogout={() => {
+              localStorage.removeItem("cavilia-current-user")
+              setCurrentUser(null)
+              setActiveScreen("home")
+            }}
           />
         )}
         {activeScreen === "adm" && !admLoggedIn && (
