@@ -3,9 +3,10 @@
 import { useState } from "react"
 import { format } from "date-fns"
 import { ptBR } from "date-fns/locale"
-import { LogOut, Pencil, Trash2, MessageCircle, Check, X, CalendarDays, AlertCircle, ChevronDown, ChevronUp, Plus, CalendarOff } from "lucide-react"
+import { LogOut, Pencil, Trash2, MessageCircle, Check, X, CalendarDays, AlertCircle, ChevronDown, ChevronUp, Plus, CalendarOff, KeyRound } from "lucide-react"
 import type { BookingData, ServiceItem } from "./schedule-screen"
 import { AdmScheduleManager, type ScheduleBlock } from "./adm-schedule-manager"
+import { AdmCredentials } from "./adm-credentials"
 
 interface AdmScreenProps {
   bookings: BookingData[]
@@ -31,6 +32,7 @@ export function AdmScreen({ bookings, services, scheduleBlocks, onUpdateBooking,
   const [confirmCancel, setConfirmCancel] = useState<number | null>(null)
   const [showServicesPanel, setShowServicesPanel] = useState(false)
   const [showScheduleManager, setShowScheduleManager] = useState(false)
+  const [showCredentials, setShowCredentials] = useState(false)
   const [editingService, setEditingService] = useState<number | null>(null)
   const [serviceEdit, setServiceEdit] = useState<Partial<ServiceItem>>({})
 
@@ -138,6 +140,13 @@ export function AdmScreen({ bookings, services, scheduleBlocks, onUpdateBooking,
               <Pencil className="h-3.5 w-3.5" />
               Serviços
               {showServicesPanel ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
+            </button>
+            <button
+              onClick={() => setShowCredentials(true)}
+              className="flex items-center gap-1.5 rounded-lg border border-border px-3 py-2 text-xs text-muted-foreground transition-colors hover:border-gold/40 hover:text-gold"
+              title="Credenciais ADM"
+            >
+              <KeyRound className="h-3.5 w-3.5" />
             </button>
             <button
               onClick={onLogout}
@@ -345,6 +354,11 @@ export function AdmScreen({ bookings, services, scheduleBlocks, onUpdateBooking,
           </>
         )}
       </div>
+
+      {/* Modal de Credenciais */}
+      {showCredentials && (
+        <AdmCredentials onClose={() => setShowCredentials(false)} />
+      )}
 
       {/* Modal de Agenda */}
       {showScheduleManager && (

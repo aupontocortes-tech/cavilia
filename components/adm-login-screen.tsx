@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { Lock, Eye, EyeOff } from "lucide-react"
+import { getAdmCreds } from "./adm-credentials"
 
 interface AdmLoginScreenProps {
   onLogin: () => void
@@ -28,7 +29,12 @@ export function AdmLoginScreen({ onLogin }: AdmLoginScreenProps) {
   }, [])
 
   function handleLogin() {
-    if (user.toLowerCase() === "cavilia" && pass === "0000") {
+    const creds = getAdmCreds()
+    const userMatch = user.toLowerCase() === creds.user.toLowerCase() ||
+      (creds.email && user.toLowerCase() === creds.email.toLowerCase())
+    const passMatch = pass === creds.pass
+
+    if (userMatch && passMatch) {
       setError(false)
       if (rememberMe) {
         localStorage.setItem("cavilia-adm-saved", JSON.stringify({ user, pass }))
