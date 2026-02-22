@@ -91,7 +91,7 @@ export function PwaInstall() {
           <img src="/images/emblem.png" alt="CAVILIA" className="h-12 w-12 rounded-full object-contain bg-black" />
           <div className="flex-1">
             <p className="font-serif text-sm font-bold" style={goldText}>Instalar CAVILIA</p>
-            <p className="text-xs text-muted-foreground">Adicione à tela inicial do seu celular</p>
+            <p className="text-xs text-muted-foreground">Para baixar o aplicativo, cole o link no navegador</p>
           </div>
         </div>
         <button
