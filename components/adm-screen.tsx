@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { format } from "date-fns"
 import { ptBR } from "date-fns/locale"
-import { LogOut, Pencil, Trash2, MessageCircle, Check, X, CalendarDays, AlertCircle, ChevronDown, ChevronUp, Plus, CalendarOff, KeyRound } from "lucide-react"
+import { LogOut, Pencil, Trash2, MessageCircle, Check, X, CalendarDays, AlertCircle, ChevronDown, ChevronUp, Plus, CalendarX2, KeyRound } from "lucide-react"
 import type { BookingData, ServiceItem } from "./schedule-screen"
 import { AdmScheduleManager, type ScheduleBlock } from "./adm-schedule-manager"
 import { AdmCredentials } from "./adm-credentials"
@@ -124,7 +124,7 @@ export function AdmScreen({ bookings, services, scheduleBlocks, onUpdateBooking,
               }}
               title="Folgas e horários bloqueados"
             >
-              <CalendarOff className="h-3.5 w-3.5" />
+              <CalendarX2 className="h-3.5 w-3.5" />
               Agenda
             </button>
             {/* Botão Gerenciar Serviços */}
