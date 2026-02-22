@@ -26,8 +26,8 @@ export function PwaInstall() {
       (window.navigator as Navigator & { standalone?: boolean }).standalone === true
     if (isStandalone) return
 
-    // Verifica se já fechou o banner antes
-    if (localStorage.getItem("cavilia-pwa-dismissed")) return
+    // Verifica se fechou nesta sessão (não persiste entre sessões)
+    if (sessionStorage.getItem("cavilia-pwa-dismissed")) return
 
     // Detecta iOS
     const isIos = /iphone|ipad|ipod/i.test(navigator.userAgent)
@@ -50,7 +50,7 @@ export function PwaInstall() {
     setShowAndroid(false)
     setShowIos(false)
     setDismissed(true)
-    localStorage.setItem("cavilia-pwa-dismissed", "1")
+    sessionStorage.setItem("cavilia-pwa-dismissed", "1")
   }
 
   async function handleInstallAndroid() {
