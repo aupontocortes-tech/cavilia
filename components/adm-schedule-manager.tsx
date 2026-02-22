@@ -90,8 +90,8 @@ export function AdmScheduleManager({ blocks, onUpdate, onClose }: AdmScheduleMan
   const specificBlocks = blocks.timeBlocks.filter((b) => b.date !== "*")
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-end justify-center bg-black/70 backdrop-blur-sm">
-      <div className="w-full max-w-md rounded-t-2xl border-t border-border bg-[#110e0b] max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 backdrop-blur-sm px-4">
+      <div className="w-full max-w-md rounded-2xl border border-border bg-[#110e0b] max-h-[85vh] overflow-y-auto shadow-2xl">
         {/* Header */}
         <div className="sticky top-0 z-10 flex items-center justify-between border-b border-border bg-[#110e0b] px-4 py-4">
           <h2 className="font-serif text-lg font-bold" style={goldGradient}>
