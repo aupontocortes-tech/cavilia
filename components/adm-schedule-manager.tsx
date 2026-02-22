@@ -24,9 +24,10 @@ interface AdmScheduleManagerProps {
 
 const TIME_SLOTS = [
   "09:00","09:30","10:00","10:30","11:00","11:30",
-  "12:00","12:30","13:00","13:30","14:00","14:30","15:00",
-  "15:30","16:00","16:30","17:00","17:30","18:00",
-  "18:30","19:00","19:30",
+  "12:00","12:30","13:00","13:30","14:00","14:30",
+  "15:00","15:30","16:00","16:30","17:00","17:30",
+  "18:00","18:30","19:00","19:30","20:00","20:30",
+  "21:00","21:30","22:00",
 ]
 
 const BLOCK_LABELS = ["Almoço", "Fechado", "Reunião", "Horário reservado", "Saída antecipada"]
@@ -214,7 +215,7 @@ export function AdmScheduleManager({ blocks, onUpdate, onClose }: AdmScheduleMan
         {tab === "timeblocks" && (
           <div className="p-4">
             <p className="mb-4 text-xs text-muted-foreground">
-              Bloqueie horários fixos (ex: almoço) ou para um dia específico. Esses horários ficam indisponíveis para o cliente.
+              Bloqueie horários que ficam <span className="text-amber-400 font-medium">indisponíveis para todos os dias</span> (ex: almoço, fechamento). Para um dia específico, escolha a data no seletor.
             </p>
 
             {/* Formulário de novo bloqueio */}
@@ -271,16 +272,22 @@ export function AdmScheduleManager({ blocks, onUpdate, onClose }: AdmScheduleMan
             {/* Bloqueios recorrentes (todos os dias) */}
             {recurringBlocks.length > 0 && (
               <div className="mb-4">
-                <p className="mb-2 text-xs font-medium text-muted-foreground uppercase tracking-wider">Todos os dias</p>
+                <div className="mb-2 flex items-center gap-2">
+                  <p className="text-xs font-medium text-amber-400 uppercase tracking-wider">🔒 Bloqueados — Todos os dias</p>
+                  <span className="text-[10px] text-muted-foreground/50">(toque no lixo para desbloquear)</span>
+                </div>
                 <div className="flex flex-col gap-1.5">
                   {recurringBlocks.map((b, i) => (
                     <div key={i} className="flex items-center justify-between rounded-lg border border-amber-800/40 bg-amber-900/15 px-3 py-2.5">
-                      <div>
-                        <span className="text-sm font-medium text-amber-300">{b.time}</span>
-                        <span className="ml-2 text-xs text-muted-foreground">{b.label}</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-bold text-amber-300">{b.time}</span>
+                        <span className="text-[10px] text-muted-foreground bg-amber-900/30 px-1.5 py-0.5 rounded">{b.label}</span>
                       </div>
-                      <button onClick={() => removeTimeBlock(blocks.timeBlocks.indexOf(b))} className="text-muted-foreground/50 hover:text-red-400">
-                        <Trash2 className="h-3.5 w-3.5" />
+                      <button
+                        onClick={() => removeTimeBlock(blocks.timeBlocks.indexOf(b))}
+                        className="flex items-center gap-1 rounded px-2 py-1 text-[10px] text-red-400/70 hover:bg-red-900/30 hover:text-red-400 transition-colors"
+                      >
+                        <Trash2 className="h-3 w-3" /> Desbloquear
                       </button>
                     </div>
                   ))}
