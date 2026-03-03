@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react"
 import { format } from "date-fns"
 import { ptBR } from "date-fns/locale"
+import { toast } from "sonner"
 import {
   ArrowLeft, Settings, Pencil, Trash2, MessageCircle, Check, X,
   CalendarDays, AlertCircle, Plus, LogOut, KeyRound, Info
@@ -193,7 +194,7 @@ export function AdmScreen({
                   <button
                     onClick={() => {
                       setShowGearMenu(false)
-                      fetch("/api/app-settings?key=sobre").then(r => r.json()).then(d => setSobreText(d.value || "")).catch(() => {})
+                      fetch("/api/app-settings?key=sobre", { cache: "no-store" }).then(r => r.json()).then(d => setSobreText(d.value || "")).catch(() => {})
                       setShowSobreEditor(true)
                     }}
                     className="flex w-full items-center gap-3 px-4 py-3 text-sm text-foreground hover:bg-secondary"
@@ -506,14 +507,23 @@ export function AdmScreen({
                 onClick={async () => {
                   setSobreSaving(true)
                   try {
-                    await fetch("/api/app-settings", {
+                    const res = await fetch("/api/app-settings", {
                       method: "PUT",
                       headers: { "Content-Type": "application/json" },
                       body: JSON.stringify({ key: "sobre", value: sobreText }),
                     })
+                    const data = await res.json().catch(() => ({}))
+                    if (!res.ok) {
+                      toast.error(data?.error || "Erro ao salvar. Tente de novo.")
+                      return
+                    }
+                    toast.success("Sobre a CAVILIA salvo com sucesso.")
                     setShowSobreEditor(false)
-                  } catch {}
-                  setSobreSaving(false)
+                  } catch (e) {
+                    toast.error("Erro de conexão. Tente de novo.")
+                  } finally {
+                    setSobreSaving(false)
+                  }
                 }}
                 className="flex-1 rounded-lg border border-gold/40 bg-gold/20 px-4 py-3 text-sm font-medium text-gold hover:bg-gold/30 disabled:opacity-50"
               >

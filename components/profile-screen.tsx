@@ -64,9 +64,9 @@ export function ProfileScreen({ bookings, allBookings, user, onCancelBooking, on
   useEffect(() => {
     if (configPanel === "sobre") {
       setSobreLoading(true)
-      fetch("/api/app-settings?key=sobre")
+      fetch("/api/app-settings?key=sobre", { cache: "no-store" })
         .then((r) => r.json())
-        .then((d) => setSobreText(d.value || ""))
+        .then((d) => setSobreText(d.value ?? ""))
         .catch(() => setSobreText(""))
         .finally(() => setSobreLoading(false))
     }
