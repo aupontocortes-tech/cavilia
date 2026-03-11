@@ -33,6 +33,7 @@ export default function CaviliaApp() {
   })
   const [profileBookings, setProfileBookings] = useState<BookingData[]>([])
   const [showAuth, setShowAuth] = useState(false)
+  const [bookingSaving, setBookingSaving] = useState(false)
 
   useEffect(() => {
     Promise.all([
@@ -92,6 +93,8 @@ export default function CaviliaApp() {
   }
 
   async function handleConfirmBooking(booking: BookingData) {
+    if (bookingSaving) return
+    setBookingSaving(true)
     const payload = {
       serviceName: booking.service,
       price: booking.price,
@@ -124,14 +127,22 @@ export default function CaviliaApp() {
           await apiPost("/api/users/update", { phone: currentUser.phone, totalVisitas: novasVisitas })
         }
       } else {
-        const msg = data.error || "Não foi possível salvar o agendamento."
-        const desc = data.detalhe || data.dica || (r.status === 500 ? "Verifique as variáveis DATABASE_URL e DIRECT_URL na Vercel (Settings → Environment Variables)" : undefined)
+        let msg = data.error || "Não foi possível salvar o agendamento."
+        let desc = data.detalhe || data.dica
+        if (r.status === 409) {
+          msg = "Horário já reservado."
+          desc = "Já existe um agendamento nesse horário (talvez você tenha tocado em Confirmar duas vezes). Seu agendamento anterior continua válido."
+        } else if (r.status === 500 && !desc) {
+          desc = "Verifique as variáveis DATABASE_URL e DIRECT_URL na Vercel (Settings → Environment Variables)."
+        }
         toast.error(msg, { description: desc })
       }
     } catch {
       toast.error("Erro de rede ao salvar.", {
         description: "Verifique se DATABASE_URL e DIRECT_URL estão na Vercel. Acesse /api/db-check para diagnosticar.",
       })
+    } finally {
+      setBookingSaving(false)
     }
   }
 
@@ -210,6 +221,7 @@ export default function CaviliaApp() {
             user={currentUser}
             bookings={bookings}
             onRefetchBookings={refetchBookings}
+            confirmDisabled={bookingSaving}
           />
         )}
         {activeScreen === "profile" && (

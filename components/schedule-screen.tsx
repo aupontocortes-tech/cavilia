@@ -22,6 +22,7 @@ interface ScheduleScreenProps {
   user?: { name: string; phone: string } | null
   bookings?: BookingData[]
   onRefetchBookings?: () => void
+  confirmDisabled?: boolean
 }
 
 export interface BookingData {
@@ -107,7 +108,7 @@ function isTodayStillOpen(now: Date): boolean {
 
 type Step = 1 | 2 | 3 | 4
 
-export function ScheduleScreen({ onBack, onConfirm, services: servicesProp, scheduleBlocks, user, bookings = [], onRefetchBookings }: ScheduleScreenProps) {
+export function ScheduleScreen({ onBack, onConfirm, services: servicesProp, scheduleBlocks, user, bookings = [], onRefetchBookings, confirmDisabled }: ScheduleScreenProps) {
   const SERVICES = servicesProp ?? DEFAULT_SERVICES
   const [step, setStep] = useState<Step>(1)
   const [selectedService, setSelectedService] = useState<string | null>(null)
@@ -456,7 +457,12 @@ export function ScheduleScreen({ onBack, onConfirm, services: servicesProp, sche
           <div className="mt-auto pb-4 pt-6">
             <button
               onClick={handleConfirm}
-              className="flex w-full items-center justify-center gap-2 rounded-lg bg-gold px-6 py-4 font-serif text-base font-bold text-primary-foreground transition-colors hover:bg-gold-light active:bg-gold-dark"
+              disabled={confirmDisabled}
+              className={`flex w-full items-center justify-center gap-2 rounded-lg px-6 py-4 font-serif text-base font-bold text-primary-foreground transition-colors ${
+                confirmDisabled
+                  ? "bg-gold/50 cursor-not-allowed"
+                  : "bg-gold hover:bg-gold-light active:bg-gold-dark"
+              }`}
             >
               <Check className="h-5 w-5" />
               Confirmar Agendamento
