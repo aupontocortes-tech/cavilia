@@ -35,6 +35,9 @@ export default function CaviliaApp() {
   const [showAuth, setShowAuth] = useState(false)
   const [bookingSaving, setBookingSaving] = useState(false)
 
+  // ----- Notificações push (Web Push) -----
+  const publicVapidKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY
+
   useEffect(() => {
     Promise.all([
       apiGet<Array<{ id: string; service: string; price: string; date: string; time: string; clientName: string; phone: string; status: string }>>("/api/bookings"),
@@ -52,6 +55,51 @@ export default function CaviliaApp() {
       toast.error("Erro ao carregar dados. Verifique se o Supabase está configurado (npx prisma migrate dev)")
     })
   }, [])
+
+  // Registra o dispositivo do cliente para receber notificações push,
+  // usando o telefone do usuário logado.
+  useEffect(() => {
+    if (!currentUser?.phone) return
+    if (typeof window === "undefined") return
+    if (!("serviceWorker" in navigator) || !("Notification" in window)) return
+    if (!publicVapidKey) return
+
+    const alreadyForPhoneKey = `cavilia-push-registered-${currentUser.phone.replace(/\D/g, "")}`
+    if (localStorage.getItem(alreadyForPhoneKey) === "1") return
+
+    const register = async () => {
+      try {
+        const permission = await Notification.requestPermission()
+        if (permission !== "granted") return
+
+        const reg = await navigator.serviceWorker.ready
+
+        const convertedKey = urlBase64ToUint8Array(publicVapidKey)
+        const existing = await reg.pushManager.getSubscription()
+        const sub =
+          existing ||
+          (await reg.pushManager.subscribe({
+            userVisibleOnly: true,
+            applicationServerKey: convertedKey,
+          }))
+
+        await fetch("/api/push-subscribe", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            phone: currentUser.phone,
+            subscription: sub.toJSON(),
+          }),
+        })
+
+        localStorage.setItem(alreadyForPhoneKey, "1")
+      } catch {
+        // falha silenciosa; o app continua funcionando sem push
+      }
+    }
+
+    register()
+  }, [currentUser?.phone, publicVapidKey])
 
   function refetchBookings() {
     apiGet<Array<{ id: string; service: string; price: string; date: string; time: string; clientName: string; phone: string; status: string }>>("/api/bookings")
@@ -181,6 +229,17 @@ export default function CaviliaApp() {
       return
     }
     setBookings((prev) => prev.map((bk, i) => (i === index ? updated : bk)))
+  }
+
+  function urlBase64ToUint8Array(base64String: string): Uint8Array {
+    const padding = "=".repeat((4 - (base64String.length % 4)) % 4)
+    const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/")
+    const rawData = window.atob(base64)
+    const outputArray = new Uint8Array(rawData.length)
+    for (let i = 0; i < rawData.length; ++i) {
+      outputArray[i] = rawData.charCodeAt(i)
+    }
+    return outputArray
   }
 
   if (showSuccess && lastBooking) {
