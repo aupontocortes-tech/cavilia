@@ -69,6 +69,11 @@ export async function POST(request: Request) {
     if (!clientName || !phone || !date || !time) {
       return NextResponse.json({ error: "Dados incompletos" }, { status: 400 })
     }
+    const normalizePhone = (p: string) => {
+      const d = String(p || "").replace(/\D/g, "")
+      return d.length >= 12 && d.startsWith("55") ? d.slice(2) : d
+    }
+    const phoneKey = normalizePhone(phone)
     let service = serviceId
       ? await prisma.service.findUnique({ where: { id: serviceId } })
       : serviceName
@@ -101,6 +106,22 @@ export async function POST(request: Request) {
       },
       include: { service: true },
     })
+
+    // Regra: o cliente só pode ter um agendamento por dia
+    if (phoneKey) {
+      const alreadyForClient = sameDayBookings.find(
+        (b) => normalizePhone(b.phone) === phoneKey,
+      )
+      if (alreadyForClient) {
+        return NextResponse.json(
+          {
+            error: "Você já tem um agendamento neste dia.",
+            detalhe: `Seu horário atual é ${alreadyForClient.time} (${alreadyForClient.service.name}). Cancele esse agendamento antes de marcar outro horário no mesmo dia.`,
+          },
+          { status: 409 },
+        )
+      }
+    }
 
     for (const existing of sameDayBookings) {
       const existingStart = timeToMinutes(existing.time)
