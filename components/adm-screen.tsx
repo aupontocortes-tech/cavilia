@@ -52,6 +52,7 @@ export function AdmScreen({
   onExitAdm, onLogoutApp,
 }: AdmScreenProps) {
   const [activeTab, setActiveTab] = useState<TabId>("agenda")
+  const [nowMs, setNowMs] = useState(() => Date.now())
   const [editingIndex, setEditingIndex] = useState<number | null>(null)
   const [editData, setEditData] = useState<Partial<BookingData>>({})
   const [confirmDelete, setConfirmDelete] = useState<number | null>(null)
@@ -72,7 +73,7 @@ export function AdmScreen({
   const active = bookings.filter((b) => b.status !== "cancelled")
   // Regra de UI: um agendamento entra em "Histórico" após 2 horas do horário marcado.
   // Isso não altera o que está salvo no banco, apenas muda em qual lista o ADM exibe.
-  const now = new Date()
+  const now = new Date(nowMs)
   const TWO_HOURS_MS = 2 * 60 * 60 * 1000
   const activeSorted = [...active].sort((a, b) => {
     const da = toLocalDate(a.date).getTime()
@@ -94,6 +95,11 @@ export function AdmScreen({
 
   const upcoming = activeSorted.filter((b) => getBookingEndTime(b).getTime() >= now.getTime())
   const past = activeSorted.filter((b) => getBookingEndTime(b).getTime() < now.getTime())
+
+  useEffect(() => {
+    const timer = setInterval(() => setNowMs(Date.now()), 60 * 1000)
+    return () => clearInterval(timer)
+  }, [])
 
   function startEdit(index: number) {
     setEditingIndex(index)
