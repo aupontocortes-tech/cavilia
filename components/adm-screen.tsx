@@ -25,6 +25,7 @@ interface AdmScreenProps {
   onDeleteBooking: (index: number) => void
   onUpdateServices: (services: ServiceItem[]) => void
   onUpdateScheduleBlocks: (blocks: ScheduleBlock) => void
+  onRefreshBookings: () => void
   // Voltar apenas para fora da área ADM (como a seta para trás)
   onExitAdm: () => void
   // Sair do aplicativo: deslogar ADM e cliente, voltar para tela inicial
@@ -49,6 +50,7 @@ export function AdmScreen({
   bookings, services, scheduleBlocks,
   onUpdateBooking, onCancelBooking, onDeleteBooking,
   onUpdateServices, onUpdateScheduleBlocks,
+  onRefreshBookings,
   onExitAdm, onLogoutApp,
 }: AdmScreenProps) {
   const [activeTab, setActiveTab] = useState<TabId>("agenda")
@@ -68,6 +70,8 @@ export function AdmScreen({
   const serviceRefs = useRef<(HTMLDivElement | null)[]>([])
   const [showReminderMessage, setShowReminderMessage] = useState(false)
   const [reminderTemplate, setReminderTemplate] = useState<string | null>(null)
+  const [showClearHistoryModal, setShowClearHistoryModal] = useState(false)
+  const [clearingHistory, setClearingHistory] = useState(false)
 
   const cancelled = bookings.filter((b) => b.status === "cancelled")
   const active = bookings.filter((b) => b.status !== "cancelled")
@@ -161,6 +165,28 @@ export function AdmScreen({
     const msg = encodeURIComponent(text)
     const number = phone.replace(/\D/g, "")
     window.open(`https://wa.me/55${number}?text=${msg}`, "_blank")
+  }
+
+  async function clearHistory(mode: "month" | "quarter" | "year" | "three_years" | "all") {
+    setClearingHistory(true)
+    try {
+      const r = await fetch("/api/bookings/history", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ mode }),
+      })
+      const data = await r.json().catch(() => ({}))
+      if (!r.ok || !data?.ok) {
+        throw new Error(data?.error || "Erro ao apagar histórico")
+      }
+      toast.success(`Histórico apagado (${data.deleted || 0} registro(s)).`)
+      setShowClearHistoryModal(false)
+      onRefreshBookings()
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Erro ao apagar histórico")
+    } finally {
+      setClearingHistory(false)
+    }
   }
 
   function startServiceEdit(i: number) {
@@ -266,6 +292,14 @@ export function AdmScreen({
                   >
                     <KeyRound className="h-4 w-4 text-gold" />
                     Trocar senha ADM
+                  </button>
+                  <div className="border-t border-border/50" />
+                  <button
+                    onClick={() => { setShowGearMenu(false); setShowClearHistoryModal(true) }}
+                    className="flex w-full items-center gap-3 px-4 py-3 text-sm text-foreground hover:bg-secondary"
+                  >
+                    <Trash2 className="h-4 w-4 text-gold" />
+                    Apagar histórico
                   </button>
                   <div className="border-t border-border/50" />
                   <button
@@ -671,6 +705,39 @@ export function AdmScreen({
                 {sobreSaving ? "Salvando..." : "Salvar"}
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Apagar Histórico */}
+      {showClearHistoryModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm">
+          <div className="mx-6 w-full max-w-sm rounded-lg border border-border bg-card p-6">
+            <div className="mb-4 flex items-center justify-between">
+              <h3 className="font-serif text-lg font-bold text-foreground">Apagar histórico</h3>
+              <button
+                onClick={() => !clearingHistory && setShowClearHistoryModal(false)}
+                className="text-muted-foreground hover:text-foreground"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <p className="mb-4 text-xs text-muted-foreground">
+              Remove apenas histórico de cortes já realizados (mais de 2h após o horário). Não remove agendamentos futuros.
+            </p>
+            <div className="grid grid-cols-2 gap-2">
+              <button disabled={clearingHistory} onClick={() => clearHistory("month")} className="rounded-lg border border-border bg-secondary px-3 py-2 text-xs text-foreground hover:bg-secondary/80 disabled:opacity-50">Apagar mensal</button>
+              <button disabled={clearingHistory} onClick={() => clearHistory("quarter")} className="rounded-lg border border-border bg-secondary px-3 py-2 text-xs text-foreground hover:bg-secondary/80 disabled:opacity-50">Apagar trimestral</button>
+              <button disabled={clearingHistory} onClick={() => clearHistory("year")} className="rounded-lg border border-border bg-secondary px-3 py-2 text-xs text-foreground hover:bg-secondary/80 disabled:opacity-50">Apagar 12 meses</button>
+              <button disabled={clearingHistory} onClick={() => clearHistory("three_years")} className="rounded-lg border border-border bg-secondary px-3 py-2 text-xs text-foreground hover:bg-secondary/80 disabled:opacity-50">Apagar 3 anos</button>
+            </div>
+            <button
+              disabled={clearingHistory}
+              onClick={() => clearHistory("all")}
+              className="mt-3 w-full rounded-lg border border-red-500/40 bg-red-900/40 px-4 py-2.5 text-sm font-medium text-red-300 hover:bg-red-900/60 disabled:opacity-50"
+            >
+              {clearingHistory ? "Apagando..." : "Apagar todo histórico"}
+            </button>
           </div>
         </div>
       )}

@@ -321,6 +321,7 @@ export default function CaviliaApp() {
               if (res) setScheduleBlocks(res)
               else setScheduleBlocks(blocks)
             }}
+            onRefreshBookings={refetchBookings}
             onExitAdm={() => {
               // Apenas sair do painel ADM e voltar para a Home
               setAdmLoggedIn(false)
