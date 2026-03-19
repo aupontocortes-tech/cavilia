@@ -72,6 +72,8 @@ export function AdmScreen({
   const [reminderTemplate, setReminderTemplate] = useState<string | null>(null)
   const [showClearHistoryModal, setShowClearHistoryModal] = useState(false)
   const [clearingHistory, setClearingHistory] = useState(false)
+  const [autoHistoryWindow, setAutoHistoryWindow] = useState<"off" | "1m" | "2m" | "3m" | "1y">("off")
+  const [savingAutoHistory, setSavingAutoHistory] = useState(false)
 
   const cancelled = bookings.filter((b) => b.status === "cancelled")
   const active = bookings.filter((b) => b.status !== "cancelled")
@@ -143,6 +145,25 @@ export function AdmScreen({
     return () => { cancelled = true }
   }, [])
 
+  useEffect(() => {
+    let cancelled = false
+    async function loadAutoHistoryWindow() {
+      try {
+        const r = await fetch("/api/app-settings?key=booking_history_auto_window", { cache: "no-store" })
+        if (!r.ok) return
+        const data = await r.json().catch(() => ({}))
+        const value = String(data?.value || "off")
+        if (!cancelled && (value === "off" || value === "1m" || value === "2m" || value === "3m" || value === "1y")) {
+          setAutoHistoryWindow(value)
+        }
+      } catch {
+        // ignore
+      }
+    }
+    loadAutoHistoryWindow()
+    return () => { cancelled = true }
+  }, [])
+
   function buildWhatsAppMessage(clientName: string, booking: BookingData): string {
     const base =
       reminderTemplate?.trim() ||
@@ -186,6 +207,24 @@ export function AdmScreen({
       toast.error(e instanceof Error ? e.message : "Erro ao apagar histórico")
     } finally {
       setClearingHistory(false)
+    }
+  }
+
+  async function saveAutoHistoryWindow() {
+    setSavingAutoHistory(true)
+    try {
+      const r = await fetch("/api/app-settings", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ key: "booking_history_auto_window", value: autoHistoryWindow }),
+      })
+      const data = await r.json().catch(() => ({}))
+      if (!r.ok) throw new Error(data?.error || "Erro ao salvar configuração automática")
+      toast.success("Limpeza automática do histórico atualizada.")
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Erro ao salvar configuração")
+    } finally {
+      setSavingAutoHistory(false)
     }
   }
 
@@ -738,6 +777,32 @@ export function AdmScreen({
             >
               {clearingHistory ? "Apagando..." : "Apagar todo histórico"}
             </button>
+
+            <div className="mt-4 border-t border-border/60 pt-4">
+              <p className="mb-2 text-xs font-medium uppercase tracking-wider text-gold">Limpeza automática</p>
+              <p className="mb-3 text-xs text-muted-foreground">
+                O sistema remove automaticamente históricos antigos de acordo com o período escolhido.
+              </p>
+              <select
+                value={autoHistoryWindow}
+                onChange={(e) => setAutoHistoryWindow(e.target.value as "off" | "1m" | "2m" | "3m" | "1y")}
+                className="w-full rounded-lg border border-border bg-secondary px-3 py-2.5 text-sm text-foreground focus:border-gold focus:outline-none"
+                disabled={savingAutoHistory}
+              >
+                <option value="off">Desativado</option>
+                <option value="1m">Apagar após 1 mês</option>
+                <option value="2m">Apagar após 2 meses</option>
+                <option value="3m">Apagar após 3 meses</option>
+                <option value="1y">Apagar após 1 ano</option>
+              </select>
+              <button
+                onClick={saveAutoHistoryWindow}
+                disabled={savingAutoHistory}
+                className="mt-3 w-full rounded-lg border border-gold/40 bg-gold/20 px-4 py-2.5 text-sm font-medium text-gold hover:bg-gold/30 disabled:opacity-50"
+              >
+                {savingAutoHistory ? "Salvando..." : "Salvar limpeza automática"}
+              </button>
+            </div>
           </div>
         </div>
       )}
