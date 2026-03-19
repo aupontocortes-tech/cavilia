@@ -428,7 +428,7 @@ export function AdmScreen({
               <p className="text-sm text-muted-foreground">Nenhum agendamento próximo</p>
             </div>
           ) : (
-            <div className="flex flex-col gap-3">
+            <div className="grid grid-cols-1 gap-3 lg:grid-cols-2 2xl:grid-cols-3">
               {upcoming.map((b) => {
                 const gi = bookings.indexOf(b)
                 return (
