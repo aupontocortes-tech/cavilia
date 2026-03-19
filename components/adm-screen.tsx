@@ -277,11 +277,11 @@ export function AdmScreen({
     <div className="flex min-h-screen flex-col pb-24">
       {/* ── HEADER ── */}
       <header className="sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur-md">
-        <div className="relative flex items-center px-4 py-3">
+        <div className="relative flex items-center px-4 py-3 lg:px-8 lg:py-4">
           {/* Seta voltar */}
           <button
             onClick={onExitAdm}
-            className="flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:text-foreground"
+            className="flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:text-foreground lg:h-10 lg:w-10"
           >
             <ArrowLeft className="h-5 w-5" />
           </button>
@@ -289,7 +289,7 @@ export function AdmScreen({
           {/* Título centralizado */}
           <div className="absolute left-0 right-0 flex flex-col items-center pointer-events-none">
             <span
-              className="font-serif text-base font-bold"
+              className="font-serif text-base font-bold lg:text-xl"
               style={{
                 background: "linear-gradient(180deg, #f5cc50 0%, #d4a017 45%, #f0bc2a 70%, #a87c0e 100%)",
                 WebkitBackgroundClip: "text",
@@ -299,7 +299,7 @@ export function AdmScreen({
             >
               Painel ADM
             </span>
-            <span className="text-[9px] text-muted-foreground uppercase tracking-wider">
+            <span className="text-[9px] text-muted-foreground uppercase tracking-wider lg:text-[11px]">
               CAVILIA Studio Club
             </span>
           </div>
@@ -308,7 +308,7 @@ export function AdmScreen({
           <div className="ml-auto relative">
             <button
               onClick={() => setShowGearMenu((v) => !v)}
-              className="flex h-9 w-9 items-center justify-center rounded-full border border-gold/30 text-gold hover:bg-gold/10"
+              className="flex h-9 w-9 items-center justify-center rounded-full border border-gold/30 text-gold hover:bg-gold/10 lg:h-11 lg:w-11"
             >
               <Settings className="h-4 w-4" />
             </button>
@@ -402,15 +402,15 @@ export function AdmScreen({
         </div>
 
         {/* ── ABAS ── */}
-        <div className="flex border-t border-border/50">
+        <div className="flex border-t border-border/50 lg:px-3">
           {tabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex-1 py-2.5 text-xs font-medium tracking-wide transition-colors ${
+              className={`flex-1 py-2.5 text-xs font-medium tracking-wide transition-colors lg:rounded-t-md lg:py-3.5 lg:text-sm lg:font-semibold ${
                 activeTab === tab.id
-                  ? "border-b-2 border-gold text-gold"
-                  : "text-muted-foreground hover:text-foreground"
+                  ? "border-b-2 border-gold text-gold lg:bg-gold/10"
+                  : "text-muted-foreground hover:text-foreground lg:hover:bg-secondary/40"
               }`}
             >
               {tab.label}
