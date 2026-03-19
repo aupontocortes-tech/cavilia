@@ -174,7 +174,7 @@ export function ScheduleScreen({ onBack, onConfirm, services: servicesProp, sche
   const stepLabels = ["Servico", "Data", "Horario", "Confirmar"]
 
   return (
-    <div className="flex min-h-screen flex-col pb-24">
+    <div className="mx-auto flex min-h-screen w-full max-w-screen-xl flex-col pb-24 lg:max-w-6xl">
       {/* Header */}
       <header className="sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur-md">
         <div className="flex items-center gap-3 px-4 py-4">
@@ -225,16 +225,16 @@ export function ScheduleScreen({ onBack, onConfirm, services: servicesProp, sche
 
       {/* Step 1: Service Selection */}
       {step === 1 && (
-        <div className="flex-1 px-4 pt-4">
+        <div className="flex-1 px-4 pt-4 lg:px-6">
           <p className="mb-4 text-sm text-muted-foreground">
             Escolha o servico desejado:
           </p>
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-3 lg:grid lg:grid-cols-2 lg:gap-4">
             {SERVICES.map((s) => (
               <button
                 key={s.id}
                 onClick={() => handleServiceSelect(s.id)}
-                className={`flex items-start gap-4 rounded-lg border p-4 text-left transition-all ${
+                className={`flex items-start gap-4 rounded-lg border p-4 text-left transition-all lg:min-h-[120px] ${
                   selectedService === s.id
                     ? "border-gold bg-gold/5"
                     : "border-border bg-card hover:border-gold/30"
